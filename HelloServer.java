@@ -1,0 +1,29 @@
+import com.sun.net.httpserver.HttpServer;
+import com.sun.net.httpserver.HttpHandler;
+import com.sun.net.httpserver.HttpExchange;
+import java.io.OutputStream;
+import java.net.InetSocketAddress;
+
+public class HelloServer {
+    public static void main(String[] args) throws Exception {
+        int port = 8080;
+        HttpServer server = HttpServer.create(new InetSocketAddress(port), 0);
+        server.createContext("/", new RootHandler());
+        System.out.println("Starting server at http://0.0.0.0:" + port);
+        server.setExecutor(null);
+        server.start();
+    }
+    static class RootHandler implements HttpHandler {
+        public void handle(HttpExchange exchange) {
+            try {
+                String response = "Hello from EC2 (Java)!";
+                exchange.sendResponseHeaders(200, response.getBytes().length);
+                OutputStream os = exchange.getResponseBody();
+                os.write(response.getBytes());
+                os.close();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+    }
+}
